@@ -10,17 +10,17 @@ class HomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<HomePage> {
   final dio = Dio();
+  var listCountries = [];
 
   getCounties() async {
     try {
-      final response = await dio.get('https://restcountries.com/v3.1/all',
-          options: Options(
-              sendTimeout: const Duration(seconds: 5),
-              receiveTimeout: const Duration(seconds: 5)));
-      print(response);
+      final response = await dio.get('https://restcountries.com/v3.1/all');
+
+      setState(() {
+        listCountries = response.data;
+      });
     } catch (e) {
       print('Error fetching countries: $e');
-      // Vous pouvez également afficher une boîte de dialogue ou un snackbar ici
     }
   }
 
@@ -45,22 +45,36 @@ class _MyHomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(10),
-        children: const [
-          TextField(
-            decoration: InputDecoration(
-              hintFadeDuration: Duration(milliseconds: 100),
-              hintText: 'Phone',
-              prefixIcon: Icon(Icons.phone),
-              hintMaxLines: 9,
-            ),
-            autocorrect: true,
-            keyboardType: TextInputType.phone,
-            keyboardAppearance: Brightness.dark,
-          ),
-        ],
-      ),
+      body: ListView.builder(
+          scrollDirection: Axis.vertical,
+          itemCount: listCountries.length,
+          itemBuilder: (context, index) {
+            return ListTile(
+              leading: Text(
+                listCountries[index]['flag'],
+                style: const TextStyle(fontSize: 25),
+              ),
+              title: Text(listCountries[index]['name']['common']),
+              subtitle: Text(listCountries[index]['capital'][0]),
+            );
+          }),
+
+      // ListView(
+      //   padding: const EdgeInsets.all(10),
+      //   children: const [
+      //     TextField(
+      //       decoration: InputDecoration(
+      //         hintFadeDuration: Duration(milliseconds: 100),
+      //         hintText: 'Phone',
+      //         prefixIcon: Icon(Icons.phone),
+      //         hintMaxLines: 9,
+      //       ),
+      //       autocorrect: true,
+      //       keyboardType: TextInputType.phone,
+      //       keyboardAppearance: Brightness.dark,
+      //     ),
+      //   ],
+      // ),
     );
   }
 }
